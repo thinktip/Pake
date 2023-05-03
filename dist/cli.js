@@ -15,9 +15,9 @@ import { fileTypeFromBuffer } from 'file-type';
 import { dir } from 'tmp-promise';
 import ora from 'ora';
 import shelljs from 'shelljs';
-import { exec } from 'child_process';
 import { promisify } from 'util';
 import dns from 'dns';
+import http from 'http';
 import updateNotifier from 'update-notifier';
 
 /******************************************************************************
@@ -1767,7 +1767,12 @@ function mergeTauriConfig(url, options, tauriConf) {
         if (process.platform === "linux") {
             delete tauriConf.tauri.bundle.deb.files;
             if (["all", "deb", "appimage"].includes(options.targets)) {
-                tauriConf.tauri.bundle.targets = [options.targets];
+                if (options.targets === "all") {
+                    tauriConf.tauri.bundle.targets = ["deb", "appimage"];
+                }
+                else {
+                    tauriConf.tauri.bundle.targets = [options.targets];
+                }
             }
             else {
                 logger.warn("targets must be 'all', 'deb', 'appimage', we will use default 'all'");
@@ -2019,53 +2024,66 @@ function shellExec(command) {
     });
 }
 
+const ping = (host) => __awaiter(void 0, void 0, void 0, function* () {
+    const lookup = promisify(dns.lookup);
+    const ip = yield lookup(host);
+    const start = new Date();
+    return new Promise((resolve, reject) => {
+        const req = http.get(`http://${ip.address}`, (res) => {
+            const delay = new Date().getTime() - start.getTime();
+            res.resume();
+            resolve(delay);
+        });
+        req.on('error', (err) => {
+            reject(err);
+        });
+    });
+});
 const resolve = promisify(dns.resolve);
 function isChinaDomain(domain) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // 解析域名为IP地址
             const [ip] = yield resolve(domain);
-            return yield isChinaIP(ip);
+            return yield isChinaIP(ip, domain);
         }
         catch (error) {
             // 域名无法解析，返回false
+            logger.info(`${domain} can't be parse, is not in China!`);
             return false;
         }
     });
 }
-function isChinaIP(ip) {
+function isChinaIP(ip, domain) {
     return __awaiter(this, void 0, void 0, function* () {
-        return new Promise((resolve, reject) => {
-            exec(`ping -c 1 -w 1 ${ip}`, (error, stdout, stderr) => {
-                if (error) {
-                    // 命令执行出错，返回false
-                    resolve(false);
-                }
-                else {
-                    // 解析输出信息，提取延迟值
-                    const match = stdout.match(/time=(\d+\.\d+) ms/);
-                    const latency = match ? parseFloat(match[1]) : 0;
-                    // 判断延迟是否超过100ms
-                    resolve(latency > 100);
-                }
-            });
-        });
+        try {
+            const delay = yield ping(ip);
+            logger.info(`${domain} latency is ${delay} ms`);
+            // 判断延迟是否超过500ms
+            return delay > 500;
+        }
+        catch (error) {
+            // 命令执行出错，返回false
+            logger.info(`ping ${domain} failed!, is not in China!`);
+            return false;
+        }
     });
 }
 
-const is_china = isChinaDomain("sh.rustup.rs");
-let RustInstallScriptFocMac = "";
-if (is_china) {
-    RustInstallScriptFocMac =
-        'export RUSTUP_DIST_SERVER="https://rsproxy.cn" && export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup" && curl --proto "=https" --tlsv1.2 -sSf https://rsproxy.cn/rustup-init.sh | sh';
-}
-else {
-    RustInstallScriptFocMac =
-        "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y";
-}
-const RustInstallScriptForWin = 'winget install --id Rustlang.Rustup';
 function installRust() {
     return __awaiter(this, void 0, void 0, function* () {
+        const is_china = yield isChinaDomain("sh.rustup.rs");
+        let RustInstallScriptFocMac = "";
+        if (is_china) {
+            logger.info("it's in China, use rust cn mirror to install rust");
+            RustInstallScriptFocMac =
+                'export RUSTUP_DIST_SERVER="https://rsproxy.cn" && export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup" && curl --proto "=https" --tlsv1.2 -sSf https://rsproxy.cn/rustup-init.sh | sh';
+        }
+        else {
+            RustInstallScriptFocMac =
+                "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y";
+        }
+        const RustInstallScriptForWin = 'winget install --id Rustlang.Rustup';
         const spinner = ora('Downloading Rust').start();
         try {
             yield shellExec(IS_WIN ? RustInstallScriptForWin : RustInstallScriptFocMac);
@@ -2298,11 +2316,15 @@ class MacBuilder {
             yield mergeTauriConfig(url, options, tauriConf);
             let dmgName;
             if (options.multiArch) {
-                const isChina = isChinaDomain("www.npmjs.com");
+                const isChina = yield isChinaDomain("www.npmjs.com");
                 if (isChina) {
-                    // crates.io也顺便换源
+                    logger.info("it's in China, use npm/rust cn mirror");
                     const rust_project_dir = path.join(npmDirectory, 'src-tauri', ".cargo");
-                    const project_cn_conf = path.join(rust_project_dir, "cn_config.bak");
+                    const e1 = fs$1.access(rust_project_dir);
+                    if (e1) {
+                        yield fs$1.mkdir(rust_project_dir, { recursive: true });
+                    }
+                    const project_cn_conf = path.join(npmDirectory, "src-tauri", "cn_config.bak");
                     const project_conf = path.join(rust_project_dir, "config");
                     fs$1.copyFile(project_cn_conf, project_conf);
                     yield shellExec(`cd "${npmDirectory}" && npm install --registry=https://registry.npmmirror.com && npm run build:mac`);
@@ -2377,11 +2399,15 @@ class WinBuilder {
             logger.debug('PakeAppOptions', options);
             const { name } = options;
             yield mergeTauriConfig(url, options, tauriConf);
-            const isChina = isChinaDomain("www.npmjs.com");
+            const isChina = yield isChinaDomain("www.npmjs.com");
             if (isChina) {
-                // crates.io也顺便换源
+                logger.info("it's in China, use npm/rust cn mirror");
                 const rust_project_dir = path.join(npmDirectory, 'src-tauri', ".cargo");
-                const project_cn_conf = path.join(rust_project_dir, "cn_config.bak");
+                const e1 = fs$1.access(rust_project_dir);
+                if (e1) {
+                    yield fs$1.mkdir(rust_project_dir, { recursive: true });
+                }
+                const project_cn_conf = path.join(npmDirectory, "src-tauri", "cn_config.bak");
                 const project_conf = path.join(rust_project_dir, "config");
                 fs$1.copyFile(project_cn_conf, project_conf);
                 yield shellExec(`cd "${npmDirectory}" && npm install --registry=https://registry.npmmirror.com && npm run build`);
@@ -2433,11 +2459,15 @@ class LinuxBuilder {
             logger.debug('PakeAppOptions', options);
             const { name } = options;
             yield mergeTauriConfig(url, options, tauriConf);
-            const isChina = isChinaDomain("www.npmjs.com");
+            const isChina = yield isChinaDomain("www.npmjs.com");
             if (isChina) {
-                // crates.io也顺便换源
+                logger.info("it's in China, use npm/rust cn mirror");
                 const rust_project_dir = path.join(npmDirectory, 'src-tauri', ".cargo");
-                const project_cn_conf = path.join(rust_project_dir, "cn_config.bak");
+                const e1 = fs$1.access(rust_project_dir);
+                if (e1) {
+                    yield fs$1.mkdir(rust_project_dir, { recursive: true });
+                }
+                const project_cn_conf = path.join(npmDirectory, "src-tauri", "cn_config.bak");
                 const project_conf = path.join(rust_project_dir, "config");
                 fs$1.copyFile(project_cn_conf, project_conf);
                 yield shellExec(`cd "${npmDirectory}" && npm install --registry=https://registry.npmmirror.com && npm run build`);
@@ -2493,7 +2523,7 @@ class BuilderFactory {
 }
 
 var name = "pake-cli";
-var version = "2.0.0-alpha7";
+var version = "2.0.1";
 var description = "🤱🏻 Turn any webpage into a desktop app with Rust. 🤱🏻 很简单的用 Rust 打包网页生成很小的桌面 App。";
 var engines = {
 	node: ">=16.0.0"
@@ -2529,6 +2559,7 @@ var scripts = {
 	"build:mac": "npm run tauri build -- --target universal-apple-darwin",
 	"build:all-unix": "chmod +x ./script/build.sh && ./script/build.sh",
 	"build:all-windows": "pwsh ./script/build.ps1",
+	analyze: "cd src-tauri && cargo bloat --release --crates",
 	tauri: "tauri",
 	cli: "rollup -c rollup.config.js --watch",
 	"cli:build": "cross-env NODE_ENV=production rollup -c rollup.config.js",

@@ -51,15 +51,31 @@
             <a href="https://github.com/tw93/Pake/releases/latest/download/ChatGPT_x64.msi">Windows</a>
             <a href="https://github.com/tw93/Pake/releases/latest/download/ChatGPT_x86_64.deb">Linux</a>
         </td>
+        <td>Poe
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Poe.dmg">Mac</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Poe_x64.msi">Windows</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Poe_x86_64.deb">Linux</a>
+        </td>
+    </tr>
+    <tr>
+        <td><img src=https://cdn.fliggy.com/upic/0khyI4.png width=600/></td>
+        <td><img src=https://cdn.fliggy.com/upic/7QUfi3.png width=600/></td>
+    </tr>
+    <tr>
         <td>LiZhi
             <a href="https://github.com/tw93/Pake/releases/latest/download/LiZhi.dmg">Mac</a>
             <a href="https://github.com/tw93/Pake/releases/latest/download/LiZhi_x64.msi">Windows</a>
             <a href="https://github.com/tw93/Pake/releases/latest/download/LiZhi_x86_64.deb">Linux</a>
         </td>
+        <td>ProgramMusic
+            <a href="https://github.com/tw93/Pake/releases/latest/download/ProgramMusic.dmg">Mac</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/ProgramMusic_x64.msi">Windows</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/ProgramMusic_x86_64.deb">Linux</a>
+        </td>
     </tr>
     <tr>
-        <td><img src=https://cdn.fliggy.com/upic/0khyI4.png width=600/></td>
         <td><img src=https://cdn.fliggy.com/upic/nYEKqN.jpg width=600/></td>
+        <td><img src=https://cdn.fliggy.com/upic/0C9lju.jpg width=600/></td>
     </tr>
     <tr>
       <td>YouTube
@@ -78,10 +94,26 @@
         <td><img src=https://cdn.fliggy.com/upic/sKN5Bn.png width=600/></td>
     </tr>
     <tr>
-        <td>ProgramMusic
-            <a href="https://github.com/tw93/Pake/releases/latest/download/ProgramMusic.dmg">Mac</a>
-            <a href="https://github.com/tw93/Pake/releases/latest/download/ProgramMusic_x64.msi">Windows</a>
-            <a href="https://github.com/tw93/Pake/releases/latest/download/ProgramMusic_x86_64.deb">Linux</a>
+        <td>Flomo
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Flomo.dmg">Mac</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Flomo_x64.msi">Windows</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Flomo_x86_64.deb">Linux</a>
+        </td>
+        <td>Qwerty
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Qwerty.dmg">Mac</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Qwerty_x64.msi">Windows</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Qwerty_x86_64.deb">Linux</a>
+        </td>
+    </tr>
+    <tr>
+        <td><img src=https://gw.alipayobjects.com/zos/k/30/RoUSUf.png width=600/></td>
+        <td><img src=https://cdn.fliggy.com/upic/i2eg6G.png width=600/></td>
+    </tr>
+    <tr>
+        <td>Reference
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Reference.dmg">Mac</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Reference_x64.msi">Windows</a>
+            <a href="https://github.com/tw93/Pake/releases/latest/download/Reference_x86_64.deb">Linux</a>
         </td>
         <td>CodeRunner
             <a href="https://github.com/tw93/Pake/releases/latest/download/CodeRunner.dmg">Mac</a>
@@ -90,29 +122,13 @@
         </td>
     </tr>
     <tr>
-        <td><img src=https://cdn.fliggy.com/upic/8A3FfQ.png width=600/></td>
-        <td><img src=https://cdn.fliggy.com/upic/EB1OYP.jpg width=600/></td>
-    </tr>
-    <tr>
-        <td>Flomo
-            <a href="https://github.com/tw93/Pake/releases/latest/download/Flomo.dmg">Mac</a>
-            <a href="https://github.com/tw93/Pake/releases/latest/download/Flomo_x64.msi">Windows</a>
-            <a href="https://github.com/tw93/Pake/releases/latest/download/Flomo_x86_64.deb">Linux</a>
-        </td>
-        <td>Loop
-            <a href="https://github.com/tw93/Pake/releases/latest/download/Loop.dmg">Mac</a>
-            <a href="https://github.com/tw93/Pake/releases/latest/download/Loop_x64.msi">Windows</a>
-            <a href="https://github.com/tw93/Pake/releases/latest/download/Loop_x86_64.deb">Linux</a>
-        </td>
-    </tr>
-    <tr>
-        <td><img src=https://gw.alipayobjects.com/zos/k/30/RoUSUf.png width=600/></td>
-        <td><img src=https://cdn.fliggy.com/upic/ajRw5F.png width=600/></td>
+        <td><img src=https://cdn.fliggy.com/upic/SPGMRY.png width=600/></td>
+        <td><img src=https://cdn.fliggy.com/upic/fS1lVi.jpg width=600/></td>
     </tr>
 </table>
 
 <details>
-<summary>🏂 You can download more applications (such as YuQue / Reference / Qwerty) from <a href="https://github.com/tw93/Pake/releases">Releases</a>. <b>Click here to expand the shortcuts reference!</b></summary>
+<summary>🏂 You can download more applications from <a href="https://github.com/tw93/Pake/releases">Releases</a>. <b>Click here to expand the shortcuts reference!</b></summary>
 
 <br/>
 
